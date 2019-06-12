@@ -6,13 +6,14 @@ drop table if exists "role";
 drop table if exists user_group;
 drop table if exists group_message;
 drop table if exists "event";
+drop table if exists friending;
 
 create table "user"(
 	id: serial primary key,
 	username: text unique not null,
 	"password": text not null,
 	"email": text unique not null,
-	is_admin: boolean
+	is_admin: boolean default false
 );
 
 create table "group"(
@@ -47,8 +48,21 @@ create table group_message(
 
 create table "event"(
 	id: serial primary key,
-	creator: int references "user" on delete no action,
+	creator: int references user_group on delete no action,
 	description: text not null,
 	date_posted: date default now(),
 	date_of: date not null,
+);
+
+create table friending(
+	id: serial primary key,
+	user_1: int references "user" on delete cascade,
+	user_2: int references "user" on delete cascade,
+);
+
+create table direct_message(
+	id: serial primary key,
+	friends: int references friending on delete cascade,
+	"content": text not null,
+	sent_date: date default now()
 );
