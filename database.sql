@@ -1,18 +1,18 @@
 set schema 'clamor';
 
-drop table if exists "user";
-drop table if exists "goup";
-drop table if exists "role";
-drop table if exists user_group;
-drop table if exists group_message;
-drop table if exists "event";
-drop table if exists friending;
-drop table if exists direct_message;
-drop table if exists invitation;
-drop table if exists rsvp;
-drop table if exists tag;
-drop table if exists group_tag;
 drop table if exists mute;
+drop table if exists group_tag;
+drop table if exists tag;
+drop table if exists rsvp;
+drop table if exists invitation;
+drop table if exists direct_message;
+drop table if exists friending;
+drop table if exists "event";
+drop table if exists group_message;
+drop table if exists user_group;
+drop table if exists "role";
+drop table if exists "group";
+drop table if exists "user";
 
 create table "user"(
 	id serial primary key,
@@ -35,19 +35,19 @@ create table "role"(
 );
 
 insert into "role" ("role_name")
-values ('organizer'), ('member'), ('banned');
+values ('organizer'), ('member'), ('banned'), ('left');
 
 create table user_group(
 	id serial primary key,
 	user_id int references "user" on delete cascade,
 	group_id int references  "group" on delete cascade,
 	"role" int references "role",
-	joined_date date not null
+	joined_date date default now()
 );
 
 create table group_message(
 	id serial primary key,
-	author int references "user" on delete cascade,
+	author int references user_group on delete cascade,
 	date_created date default now(),
 	"content" text not null
 );
@@ -55,6 +55,7 @@ create table group_message(
 create table "event"(
 	id serial primary key,
 	creator int references user_group on delete no action,
+	group_id int references "group" on delete cascade,
 	description text not null,
 	date_posted date default now(),
 	date_of date not null,
